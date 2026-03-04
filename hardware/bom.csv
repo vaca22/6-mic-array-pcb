@@ -1,15 +1,21 @@
-Designator,Value,Footprint,LCSC Part#,Quantity,Description
-U1,ADAU1977,LQFP-48_7x7mm_P0.5mm,C123456,1,8-Channel ADC Audio Hub
-U2,STM32F407VGT6,LQFP-100_14x14mm_P0.5mm,C789012,1,ARM Cortex-M4 MCU
-MIC1-MIC6,INMP441,SMD-4_3.76x4.72mm,C345678,6,Digital PDM MEMS Microphone
-U3,XC6206P332MR,SOT-23-3,C901234,1,3.3V LDO Regulator
-Y1,12.288MHz,HC-49SD,C567890,1,Audio Crystal Oscillator
-C1-C10,100nF,C0603,C234567,10,Decoupling Capacitor
-C11-C15,10uF,C0805,C345678,5,Power Filter Capacitor
-R1-R6,10kΩ,R0603,C456789,6,Pull-up/Pull-down Resistor
-R7-R10,0Ω,R0603,C567890,4,Jumper/Configuration
-J1,USB-C,USB-C-31-M-12,C678901,1,USB Type-C Connector
-J2,2.54mm-2x10,PinHeader-2x10,C789012,1,Debug/Programming Header
-LED1,LED Green,LED-0603,C890123,1,Power Indicator
-SW1,6x6mm,TS-1187-A-B-B,C901234,1,Reset Button
-BT1,BT-01,BT-01,C012345,1,Boot Configuration
+Designator,Value,Footprint,LCSC Part#,Quantity,Unit Price,Description
+U1,SF32LB52JUD6,LGA-56_6x6mm_P0.65mm,C5384396,1,35.00,SiFli Cortex-M33 MCU 16MB PSRAM
+U2,ADAU1977BCPZ,LQFP-48_7x7mm_P0.5mm,C123456,1,25.00,8-Channel ADC Audio Hub
+MIC1-MIC6,SPW0442LR5H,SMD-4_3.76x4.72mm,C2843908,6,2.50,Analog MEMS Microphone -38dB
+U3,XC6206P332MR,SOT-23-3,C6206332,2,0.30,3.3V LDO Regulator (Digital + Analog)
+Y1,12.288MHz,HC-49SD,C888888,1,1.00,Audio Crystal Oscillator
+C1-C6,1uF,C0603,C106106,6,0.05,Audio Coupling Capacitor
+C7-C16,100nF,C0603,C107107,10,0.03,Decoupling Capacitor
+C17-C20,10uF,C0805,C108108,4,0.10,Power Filter Capacitor
+R1-R6,1kΩ,R0603,C201201,6,0.01,Bias Resistor (Mic)
+R7-R10,10kΩ,R0603,C201202,4,0.01,Pull-up Resistor
+R11-R12,0Ω,R0603,C201203,2,0.01,Jumper (Configuration)
+J1,USB-C-16P,USB-C-31-M-12,C438982,1,1.50,USB Type-C Connector
+J2,2.54mm-2x10,PinHeader-2x10,C301401,1,0.50,Debug Header
+J3,2.54mm-1x8,PinHeader-1x8,C301402,1,0.30,Mic Output Header (Optional)
+LED1,LED Green,LED-0603,C401501,1,0.05,Power Indicator
+LED2,LED Red,LED-0603,C401502,1,0.05,Status Indicator
+SW1,6x6mm,TS-1187-A-B-B,C501601,1,0.20,Reset Button
+SW2,6x6mm,TS-1187-A-B-B,C501601,1,0.20,Boot Button
+CN1,FPC-16P-0.5mm,FPC-16P-0.5mm,C601701,1,1.00,LCD Connector (Optional)
+JP1-6,Test Point,TP-0.8mm,C701801,6,0.02,Test Point (Audio Signals)
