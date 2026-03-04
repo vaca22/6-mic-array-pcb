@@ -1,0 +1,8 @@
+(sym_lib_table
+  (lib (name "Device")(type "Legacy")(uri "${KICAD60_SYM_DIR}/Device.sym-lib"))
+  (lib (name "Power")(type "Legacy")(uri "${KICAD60_SYM_DIR}/Power.sym-lib"))
+  (lib (name "MCU")(type "Legacy")(uri "${KICAD60_SYM_DIR}/MCU.sym-lib"))
+  (lib (name "Audio")(type "Legacy")(uri "${KICAD60_SYM_DIR}/Audio.sym-lib"))
+  (lib (name "Connector")(type "Legacy")(uri "${KICAD60_SYM_DIR}/Connector.sym-lib"))
+  (lib (name "6-mic-array")(type "Legacy")(uri "${PROJECT_DIR}/symbols/6-mic-array.sym-lib"))
+)

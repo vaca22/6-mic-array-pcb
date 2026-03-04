@@ -1,0 +1,13 @@
+(fp_lib_table
+  (lib (name "Package_QFP")(type "Legacy")(uri "${KICAD60_MOD_DIR}/Package_QFP.pretty"))
+  (lib (name "Package_LGA")(type "Legacy")(uri "${KICAD60_MOD_DIR}/Package_LGA.pretty"))
+  (lib (name "Package_TO_SOT_SMD")(type "Legacy")(uri "${KICAD60_MOD_DIR}/Package_TO_SOT_SMD.pretty"))
+  (lib (name "Package_Crystal")(type "Legacy")(uri "${KICAD60_MOD_DIR}/Package_Crystal.pretty"))
+  (lib (name "Connector_USB")(type "Legacy")(uri "${KICAD60_MOD_DIR}/Connector_USB.pretty"))
+  (lib (name "Button_Switch_SMD")(type "Legacy")(uri "${KICAD60_MOD_DIR}/Button_Switch_SMD.pretty"))
+  (lib (name "LED_SMD")(type "Legacy")(uri "${KICAD60_MOD_DIR}/LED_SMD.pretty"))
+  (lib (name "Capacitor_SMD")(type "Legacy")(uri "${KICAD60_MOD_DIR}/Capacitor_SMD.pretty"))
+  (lib (name "Resistor_SMD")(type "Legacy")(uri "${KICAD60_MOD_DIR}/Resistor_SMD.pretty"))
+  (lib (name "Microphone")(type "Legacy")(uri "${PROJECT_DIR}/footprints/Microphone.pretty"))
+  (lib (name "6-mic-array")(type "Legacy")(uri "${PROJECT_DIR}/footprints/6-mic-array.pretty"))
+)
