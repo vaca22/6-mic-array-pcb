@@ -1,0 +1,15 @@
+Designator,Value,Footprint,LCSC Part#,Quantity,Description
+U1,ADAU1977,LQFP-48_7x7mm_P0.5mm,C123456,1,8-Channel ADC Audio Hub
+U2,STM32F407VGT6,LQFP-100_14x14mm_P0.5mm,C789012,1,ARM Cortex-M4 MCU
+MIC1-MIC6,INMP441,SMD-4_3.76x4.72mm,C345678,6,Digital PDM MEMS Microphone
+U3,XC6206P332MR,SOT-23-3,C901234,1,3.3V LDO Regulator
+Y1,12.288MHz,HC-49SD,C567890,1,Audio Crystal Oscillator
+C1-C10,100nF,C0603,C234567,10,Decoupling Capacitor
+C11-C15,10uF,C0805,C345678,5,Power Filter Capacitor
+R1-R6,10kΩ,R0603,C456789,6,Pull-up/Pull-down Resistor
+R7-R10,0Ω,R0603,C567890,4,Jumper/Configuration
+J1,USB-C,USB-C-31-M-12,C678901,1,USB Type-C Connector
+J2,2.54mm-2x10,PinHeader-2x10,C789012,1,Debug/Programming Header
+LED1,LED Green,LED-0603,C890123,1,Power Indicator
+SW1,6x6mm,TS-1187-A-B-B,C901234,1,Reset Button
+BT1,BT-01,BT-01,C012345,1,Boot Configuration
