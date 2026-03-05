@@ -1,5 +1,24 @@
 # 6-Mic-Array-PCB
 
+```text
+
+SDK文档：
+https://docs.sifli.com/projects/sdk/latest/sf32lb52x/quickstart/index.html
+
+SF32LB52 Nano 开发版介绍：
+https://docs.sifli.com/projects/xiaozhi/get-started/SF32LB52-DevKit-Nano/
+
+官方
+https://github.com/OpenSiFli/SiFli-Wiki/blob/main/source/board/sf32lb52x/SF32LB52-DevKit-Nano.md
+
+硬件设计
+https://wiki.sifli.com/silicon/product-index.html
+https://wiki.sifli.com/hardware/SF32LB520-3-5-7-HW-Application.html
+
+SDK GitHub:
+https://github.com/OpenSiFli/SiFli-SDK
+
+```
 六路麦克风阵列 PCB 设计 - 基于 SF32LB52 + 音频 Hub 方案
 
 ## 🎯 设计目标
