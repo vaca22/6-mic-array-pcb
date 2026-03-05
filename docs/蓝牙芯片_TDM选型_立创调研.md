@@ -1,15 +1,18 @@
 # 蓝牙芯片（支持 TDM）选型调研（含立创可得性）
 
-调研目标：找“性能强 + 性价比高 + 支持 TDM + 立创可买”的蓝牙芯片/模组。  
+调研目标：找“性能强 + 性价比高 + 支持 TDM + 立创可买 + 同时支持经典蓝牙(BR/EDR)+BLE”的蓝牙芯片/模组。  
 调研时间：当前会话（价格和库存会波动）。
 
-## 1) 结论先看
+## 1) 结论先看（按“经典蓝牙+BLE”过滤）
 
-在“有公开 TDM 证据 + 立创可买 + 性价比”三个条件同时满足下，当前最稳妥的是 **Espressif ESP32 系列**：
+在“经典蓝牙(BR/EDR)+BLE + TDM能力证据 + 立创可买 + 性价比”条件下：
 
-1. **ESP32-C3（性价比优先）**
-2. **ESP32-S3（性能优先）**
-3. **ESP32-WROOM-32D（经典方案，BT4.2）**
+1. **首推：ESP32-WROOM-32D（BT4.2 双模，立创有货）**
+2. **高性能备选：Qualcomm QCC（但立创当前主要是高价预售且缺货）**
+
+排除项（不满足经典蓝牙+BLE）：
+- `ESP32-C3`：BLE only
+- `ESP32-S3`：BLE only
 
 补充（高通专项结论）：
 - 高通 `QCC` 系列性能很强，音频特性优秀；
@@ -17,11 +20,15 @@
 
 ---
 
-## 2) 候选芯片（满足 TDM 证据）
+## 2) 候选芯片（满足当前硬约束）
 
-## A. ESP32-C3（推荐：性价比最高）
+## A. ESP32-C3（已排除：BLE only，不满足经典蓝牙）
 
-- 立创商品（示例）：
+- 原因与证据：
+  - ESP32-C3 BLE 文档明确：Classic Bluetooth is not supported
+  - <https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-guides/ble/overview.html>
+
+- 立创商品（仅保留作对比）：
   - `ESP32-C3`（芯片）<https://item.szlcsc.com/3013220.html?fromZone=s_s__%2522ESP32-C3%2522>，编号 `C2838500`
   - `ESP32-C3-WROOM-02-N4`（模组）<https://item.szlcsc.com/3281215.html?fromZone=s_s__%2522ESP32-C3%2522>，编号 `C2934560`
 - 立创参考价/库存（抓取时）：
@@ -37,9 +44,13 @@
   - 文档有 `i2s_es7210_tdm` 示例（ESP32-C3）
   - 文档链接：<https://docs.espressif.com/projects/esp-idf/en/stable/esp32c3/api-reference/peripherals/i2s.html>
 
-## B. ESP32-S3（推荐：性能更强）
+## B. ESP32-S3（已排除：BLE only，不满足经典蓝牙）
 
-- 立创商品（示例）：
+- 原因与证据：
+  - ESP32-S3 BLE 文档明确：Classic Bluetooth is not supported
+  - <https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/api-guides/ble/overview.html>
+
+- 立创商品（仅保留作对比）：
   - `ESP32-S3R8`（芯片）<https://item.szlcsc.com/3198292.html?fromZone=s_s__%2522ESP32-S3%2522>，编号 `C2913194`
   - `ESP32-S3-WROOM-1-N8R8`（模组）<https://item.szlcsc.com/3198299.html?fromZone=s_s__%2522ESP32-S3%2522>，编号 `C2913201`
   - `ESP32-S3-MINI-1-N8`（模组）<https://item.szlcsc.com/3198304.html?fromZone=s_s__%2522ESP32-S3%2522>，编号 `C2913206`
@@ -57,7 +68,7 @@
   - 明确 `i2s_channel_init_tdm_mode()`
   - 文档链接：<https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/api-reference/peripherals/i2s.html>
 
-## C. ESP32-WROOM-32D（经典，BT4.2）
+## C. ESP32-WROOM-32D（当前主推：经典蓝牙 + BLE）
 
 - 立创商品（示例）：
   - `ESP32-WROOM-32D-N4` <https://item.szlcsc.com/479662.html?fromZone=s_s__%2522ESP32-WROOM-32D%2522>，编号 `C473012`
@@ -69,8 +80,11 @@
   - 双核最高 240MHz（商品描述）
   - Bluetooth 4.2
   - 音频流/MP3 解码等场景描述
+- 经典蓝牙证据（官方）：
+  - ESP32 Classic BT 页面（A2DP/SPP/HFP 等）：<https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/bluetooth/classic_bt.html>
+  - Profiles/Protocols：<https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-guides/classic-bt/profiles-protocols.html>
 - TDM 证据（官方）：
-  - ESP32 I2S 文档存在 `i2s_channel_init_tdm_mode()` API 路径
+  - ESP32 I2S 文档含 `i2s_channel_init_tdm_mode()` API 路径
   - 文档链接：<https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/i2s.html>
 
 ---
@@ -120,16 +134,15 @@
 
 结论：
 - 如果你追求“高端音频体验并且供应链可控”，高通可作为中长期路线；
-- 如果你当前目标是“立创直接下单 + 成本可控 + 快速推进 6Mic/TDM”，仍建议优先 ESP32-C3 / ESP32-S3。
+- 但在“必须经典蓝牙+BLE + 立创快速打样”条件下，当前更现实的是先用 ESP32 双模方案推进。
 
 ---
 
-## 4) 选型建议（针对你的 6Mic 方向）
+## 4) 选型建议（针对你的当前硬约束）
 
-- 如果你要“6Mic 独立通道 + TDM 输入”且预算敏感：优先 `ESP32-C3`
-- 如果你要更强算力（关键词检测/算法余量）：优先 `ESP32-S3`
-- 如果你要经典成熟方案且可接受 BT4.2：`ESP32-WROOM-32D`
-- 如果你坚持高通路线：建议先确认代理供货与SDK门槛，再做 PoC，不建议直接以立创预售料开量产。
+- 当前首选：`ESP32-WROOM-32D`（满足经典蓝牙+BLE，立创现货可下单）。
+- 高通路线：性能更强，但先解决供货和成本（当前立创条目缺货且价格高）。
+- 对 `ESP32-C3/S3`：可作 BLE-only 备选，不适合作为你当前“经典蓝牙+BLE”主方案。
 
 ## 5) 风险与确认项
 
