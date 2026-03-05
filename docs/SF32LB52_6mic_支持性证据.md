@@ -7,6 +7,7 @@
   - 公开接口明确为 `1x I2S + 1x PDM`；
   - SDK I2S 配置模型是 `mono/stereo`，不是 `TDM slot`。
 - 因此在“6 路独立数字麦通道直入 MCU”这个目标上，**当前证据不足以支持可行**。
+- **直接用 MCU 的 PDM 外设时，最多 2 路 PDM 通道（L/R），等效最多 2 颗 PDM Mic（同一数据线时分）**。
 
 ## 证据 1：官方硬件文档列出的音频接口数量
 
@@ -97,3 +98,93 @@ track: 1 mono, 0 stereo
 
 - 如果你要的是“**6 路独立 Mic 采样流进入 MCU**”，当前官方文档链路里没有足够证据证明 SF32LB52 具备对应 TDM 多槽接收能力。
 - 如果你接受“**前端先做降维/混音，再给 MCU 双声道 I2S**”，则 SF32LB52 可以用。
+
+## 证据 5：深入到 I2S 寄存器，未见 TDM/Slot 字段
+
+来源：同一份 `UM5201-SF32LB52x-EN.pdf`（I2S 章节寄存器页）
+
+I2S 时序模式寄存器摘录：
+
+```text
+AUDIO_SERIAL_TIMING.timing
+00: I2S mode
+01: Left justified
+10: right justified
+11: reserved
+```
+
+I2S 声道相关寄存器摘录：
+
+```text
+TX_PCM_FORMAT.track_flag
+0: stereo
+1: mono
+```
+
+说明：
+- 公开寄存器给出的数据格式选择仅是 `I2S/Left/Right justified`；
+- 声道维度是 `mono/stereo`，没有 `slot_num/slot_width/tdm_enable` 这类典型 TDM 多槽字段。
+
+## 证据 6：官方 SDK 源码层（SiFli-SDK）仍无 TDM 配置路径
+
+来源：OpenSiFli 官方仓库
+- 仓库：<https://github.com/OpenSiFli/SiFli-SDK>
+- I2S HAL 头文件：<https://raw.githubusercontent.com/OpenSiFli/SiFli-SDK/main/drivers/Include/bf0_hal_i2s.h>
+- I2S HAL 源文件：<https://raw.githubusercontent.com/OpenSiFli/SiFli-SDK/main/drivers/hal/bf0_hal_i2s.c>
+
+头文件结构体摘录：
+
+```c
+uint8_t track;      /* 1 mono, 0 stereo */
+uint8_t lrck_invert;/* standard I2S / Left-Right Justified */
+uint8_t pcm_dw;     /* data width */
+```
+
+源码寄存器配置摘录：
+
+```c
+/* 0 I2S mode, 1 left justified, 2 right justifiled */
+AUDIO_SERIAL_TIMING.TIMING = ...
+
+/* Mono or stereo */
+TX_PCM_FORMAT.TRACK_FLAG = ...
+```
+
+说明：
+- HAL 配置项和驱动写寄存器路径都围绕 I2S/LJ/RJ + mono/stereo；
+- 没有发现 TDM 多槽的初始化参数、寄存器写入或模式枚举。
+
+## 证据 7：PDM 外设通道模型是 Left/Right（2 路）
+
+来源 1：SDK HAL PDM API  
+链接：<https://docs.sifli.com/projects/sdk/latest/sf32lb52x/api/hal/pdm.html>
+
+摘录：
+
+```text
+enum PDM_ChannelTypeDef
+PDM_CHANNEL_LEFT_ONLY
+PDM_CHANNEL_RIGHT_ONLY
+PDM_CHANNEL_STEREO
+PDM_CHANNEL_STEREO_SWAP
+```
+
+来源 2：User Manual PDM 寄存器描述（同一份 UM）  
+可见字段为 left/right 双通道状态位，例如：
+
+```text
+overflow_l / overflow_r
+full_l / empty_l
+full_r / empty_r
+```
+
+说明：
+- PDM 模块公开为左右双通道模型，没有更多通道枚举或多数据口描述；
+- 结合开发板引脚 `PDM1_CLK + PDM1_DAT`，可得“单 PDM 口典型最多 2 路”。
+
+---
+
+### 最终判断（深挖后）
+
+- 截至目前公开文档 + 官方 SDK 源码，**没有发现“隐藏 TDM 能力”证据**。
+- 所以“SF32LB52 直接接收 6 路独立数字麦通道”的方案仍不建议作为主方案。
