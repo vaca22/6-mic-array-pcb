@@ -5,6 +5,59 @@ https://wiki.seeedstudio.com/ReSpeaker_6-Mic_Circular_Array_kit_for_Raspberry_Pi
 
 ---
 
+## 本机树莓派 5 — SSH 连接
+
+| 项目 | 值 |
+|------|-----|
+| 主机 | 树莓派 5 |
+| 用户 | `xiaozhi` |
+| 地址 | `192.168.71.10` |
+
+**登录命令：**
+```bash
+ssh xiaozhi@192.168.71.10
+```
+
+### 六麦阵列自动测试
+
+仓库内提供脚本，用于在树莓派上**自动检测设备 → 录音 → 验证 8 通道 WAV（前 6 路为麦克风）**。
+
+**前提：** 树莓派上已安装 **seeed-voicecard** 驱动并重启，`arecord -L` 中能看到 `seeed8micvoicec` 或 `ac108`。
+
+**在本地执行（自动复制脚本到 Pi 并运行）：**
+```bash
+cd respeaker-6mic-docs
+scp scripts/test_6mic.sh scripts/verify_wav.py xiaozhi@192.168.71.10:/tmp/respeaker_test/
+ssh xiaozhi@192.168.71.10 "cd /tmp/respeaker_test && chmod +x test_6mic.sh verify_wav.py && ./test_6mic.sh"
+```
+
+**或登录 Pi 后执行：**
+```bash
+# 先将 scripts/ 拷到 Pi 的某目录，例如 ~/respeaker_test/
+cd ~/respeaker_test
+chmod +x test_6mic.sh verify_wav.py
+./test_6mic.sh
+```
+
+**脚本步骤：**
+1. 检查 ALSA 是否识别 seeed-8mic-voicecard / ac108  
+2. 使用 `arecord` 录制 2 秒 8 通道 16 kHz S32_LE  
+3. 检查录音文件存在且大小合理  
+4. 用 `verify_wav.py` 验证 8 通道、且前 6 路麦克风有非静音信号  
+
+**首次运行结果（当前 Pi 未装 seeed-voicecard）：** 检测到系统为 Google Voice HAT，未发现 ReSpeaker 设备；需在树莓派上安装并启用 seeed-voicecard 后重新测试。
+
+### seeed-voicecard 安装记录（树莓派 5，内核 6.12）
+
+1. **使用 HinTak 分支**：`git clone https://github.com/HinTak/seeed-voicecard.git`
+2. **内核 API 修复**：在 `seeed-voicecard.c` 中将 `rtd->id` 全部替换为 `rtd->num`，然后执行 `sudo ./install.sh`。
+3. **Pi 5 专用 overlay**：原 overlay 使用 `i2s`（producer），AC108 需 Pi 为 consumer。使用 `overlays/seeed-8mic-voicecard-pi5.dtbo`，在 config.txt 中设置 `dtoverlay=seeed-8mic-voicecard-pi5`。
+4. **当前状态**：设备已识别，录音正常；6 麦中通常仅 1 路有数据（Pi 5 + RP1 I2S 已知问题，参见 [respeaker#342](https://github.com/respeaker/seeed-voicecard/issues/342)）。
+
+**完整探索记录**：见 [PI5_探索与结论.md](PI5_探索与结论.md)。
+
+---
+
 ## 一、硬件信息摘要
 
 ### 产品概述
@@ -76,6 +129,8 @@ https://wiki.seeedstudio.com/ReSpeaker_6-Mic_Circular_Array_kit_for_Raspberry_Pi
 | `AC108_Datasheet_V1.2.pdf` | AC108 ADC 数据手册 |
 | `2d.zip` | ReSpeaker 6-Mic 圆形阵列 2D 文件（zip） |
 | `ReSpeaker_Circular_Array_6Mic_HAT_case.dxf` | 6 麦圆形阵列 Voice Accessory HAT 外壳 DXF |
+| `overlays/seeed-8mic-voicecard-pi5.dtbo` | 树莓派 5 专用设备树 overlay（使用 i2s_clk_consumer） |
+| `overlays/seeed-8mic-voicecard-pi5-overlay.dts` | 上述 overlay 的源码 |
 | `README.md` | 本说明（Wiki 链接 + 硬件/软件摘要） |
 
 ---
