@@ -5,7 +5,31 @@
 - 端口：**8081**
 - 访问：`http://<树莓派IP>:8081`
 
-## 部署到树莓派
+## 使用旁路由 + 从 GitHub 部署（推荐）
+
+先让树莓派能访问外网（使用旁路由或软路由代理），再从 GitHub 拉取本仓库并部署到 Pi：
+
+1. **在树莓派上启用旁路由**（若已配置过 `/usr/local/bin/bypass-proxy.sh`）：
+   ```bash
+   sudo /usr/local/bin/bypass-ctl.sh enable   # 若已安装 bypass-ctl.sh
+   # 或按你现有方式启用代理，使 Pi 能访问 google.com / github.com
+   ```
+2. **在树莓派上一键部署**（克隆 GitHub 并安装本 Web）：
+   ```bash
+   curl -sSL https://raw.githubusercontent.com/vaca22/6-mic-array-pcb/main/pi_bypass_web/deploy-from-github.sh | bash
+   ```
+   或先克隆再执行：
+   ```bash
+   git clone --depth 1 https://github.com/vaca22/6-mic-array-pcb.git ~/6-mic-array-pcb
+   bash ~/6-mic-array-pcb/pi_bypass_web/deploy-from-github.sh
+   ```
+3. 部署完成后访问：`http://<树莓派IP>:8081`。
+
+若无法直连 GitHub，可从本机用 rsync 部署（见下方「部署到树莓派」）。
+
+---
+
+## 部署到树莓派（本机 rsync）
 
 ### 1. 复制控制脚本并配置 sudo
 
@@ -47,5 +71,8 @@ sudo systemctl start bypass-web.service
 
 - `server.py` — HTTP 服务与 /api/status、/api/enable、/api/disable、/api/test-google
 - `index.html` — 配置页与测试按钮
-- `bypass-ctl.sh` — 旁路由开关（需 sudo）
-- `bypass-web.service` — systemd 单元
+- `bypass-ctl.sh` — 旁路由开关（调用 bypass-proxy.sh，需 sudo）
+- `bypass-proxy.sh` — **透明代理本体**：redsocks + iptables，将本机 TCP 转到同网段 .100:1070 的 SOCKS5。部署时需复制到 `/usr/local/bin/`，并安装依赖：`sudo apt-get install redsocks iptables`
+- `bypass-web.service` — 配置网页 systemd 单元
+- `bypass-gateway.service` — 开机自动启用旁路由（可选）
+- `deploy-from-github.sh` — 在 Pi 上一键从 GitHub 克隆并部署本 Web（需先启用旁路由以访问 GitHub）

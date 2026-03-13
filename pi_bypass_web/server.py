@@ -12,6 +12,7 @@ from urllib.parse import urlparse, parse_qs
 
 PORT = 8081
 CTL = "/usr/local/bin/bypass-ctl.sh"
+POWER = "/usr/local/bin/pi-power.sh"
 
 
 def run_ctl(args):
@@ -25,6 +26,19 @@ def run_ctl(args):
         out = (r.stdout or "").strip()
         err = (r.stderr or "").strip()
         return r.returncode == 0, out, err
+    except Exception as e:
+        return False, "", str(e)
+
+
+def run_power(action):
+    try:
+        r = subprocess.run(
+            ["sudo", POWER, action],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        return r.returncode == 0, (r.stdout or "").strip(), (r.stderr or "").strip()
     except Exception as e:
         return False, "", str(e)
 
@@ -73,6 +87,12 @@ class Handler(BaseHTTPRequestHandler):
         elif path == "/api/test-google":
             ok, code = test_google()
             self.send_json({"ok": ok, "code": code})
+        elif path == "/api/shutdown":
+            ok, _, err = run_power("shutdown")
+            self.send_json({"ok": ok, "message": err or ("已发送关机" if ok else "失败")})
+        elif path == "/api/reboot":
+            ok, _, err = run_power("reboot")
+            self.send_json({"ok": ok, "message": err or ("已发送重启" if ok else "失败")})
         else:
             self.send_error(404)
 

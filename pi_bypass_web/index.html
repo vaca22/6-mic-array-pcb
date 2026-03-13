@@ -69,6 +69,11 @@
     <button type="button" class="btn" id="btnTest">测试访问谷歌</button>
     <div class="test-result" id="testResult"></div>
   </div>
+  <div class="card">
+    <button type="button" class="btn danger" id="btnShutdown">关机</button>
+    <button type="button" class="btn" id="btnReboot">重启</button>
+    <p class="hint">执行后树莓派将立即关机或重启，请确认无其它操作再进行。</p>
+  </div>
   <script>
     (function () {
       const statusDot = document.getElementById('statusDot');
@@ -77,6 +82,8 @@
       const btnDisable = document.getElementById('btnDisable');
       const btnTest = document.getElementById('btnTest');
       const testResult = document.getElementById('testResult');
+      const btnShutdown = document.getElementById('btnShutdown');
+      const btnReboot = document.getElementById('btnReboot');
 
       function setLoading(loading) {
         btnEnable.disabled = loading;
@@ -135,6 +142,16 @@
           testResult.className = 'test-result fail';
         });
       };
+
+      function doPower(action, label) {
+        if (!confirm('确定要' + label + '树莓派吗？')) return;
+        fetch('/api/' + action).then(r => r.json()).then(data => {
+          if (data.ok) alert('已发送' + label + '指令，连接即将断开。');
+          else alert(data.message || '操作失败');
+        }).catch(() => alert('请求失败'));
+      }
+      btnShutdown.onclick = function () { doPower('shutdown', '关机'); };
+      btnReboot.onclick = function () { doPower('reboot', '重启'); };
 
       refreshStatus();
     })();
