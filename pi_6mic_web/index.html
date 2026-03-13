@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>6 路麦克风实时波形</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 12px;
+      font-family: system-ui, sans-serif;
+      background: #0f0f12;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+    h1 { font-size: 1.1rem; margin: 0 0 8px 0; font-weight: 600; }
+    .ch {
+      margin-bottom: 6px;
+    }
+    .ch label {
+      display: inline-block;
+      width: 72px;
+      font-size: 12px;
+      color: #888;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 48px;
+      background: #1a1a1e;
+      border-radius: 4px;
+    }
+    .status { font-size: 12px; color: #666; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h1>6 路麦克风实时波形</h1>
+  <div id="channels"></div>
+  <p class="status" id="status">正在连接…</p>
+  <script>
+    (function () {
+      const RATE = 16000;
+      const CHANNELS = 6;
+      const CHUNK_FRAMES = 512;
+      const BYTES_PER_SAMPLE = 4;
+      const CHUNK_BYTES = CHUNK_FRAMES * CHANNELS * BYTES_PER_SAMPLE;
+
+      const container = document.getElementById('channels');
+      const statusEl = document.getElementById('status');
+      const canvases = [];
+      const ctxs = [];
+
+      for (let c = 0; c < CHANNELS; c++) {
+        const wrap = document.createElement('div');
+        wrap.className = 'ch';
+        const label = document.createElement('label');
+        label.textContent = '麦克风 ' + (c + 1);
+        const canvas = document.createElement('canvas');
+        canvas.width = 800;
+        canvas.height = 48;
+        wrap.appendChild(label);
+        wrap.appendChild(canvas);
+        container.appendChild(wrap);
+        canvases.push(canvas);
+        ctxs.push(canvas.getContext('2d'));
+      }
+
+      function base64ToArrayBuffer(b64) {
+        const bin = atob(b64);
+        const len = bin.length;
+        const buf = new ArrayBuffer(len);
+        const view = new Uint8Array(buf);
+        for (let i = 0; i < len; i++) view[i] = bin.charCodeAt(i);
+        return buf;
+      }
+
+      function drawChannel(ctx, samples, width, height) {
+        const len = samples.length;
+        if (len < 2) return;
+        ctx.fillStyle = '#1a1a1e';
+        ctx.fillRect(0, 0, width, height);
+        ctx.strokeStyle = '#4ade80';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        const scale = height / 2;
+        const mid = height / 2;
+        for (let i = 0; i < len; i++) {
+          const x = (i / (len - 1)) * width;
+          const y = mid - samples[i] * scale;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+
+      function processChunk(buf) {
+        if (buf.byteLength < CHUNK_BYTES) return;
+        const view = new DataView(buf);
+        const perCh = CHUNK_FRAMES;
+        const channels = [];
+        for (let c = 0; c < CHANNELS; c++) channels.push(new Float32Array(perCh));
+        for (let i = 0; i < CHUNK_FRAMES; i++) {
+          for (let c = 0; c < CHANNELS; c++) {
+            const offset = (i * CHANNELS + c) * BYTES_PER_SAMPLE;
+            const s32 = view.getInt32(offset, true);
+            channels[c][i] = s32 / 2147483648;
+          }
+        }
+        const w = canvases[0].width;
+        const h = canvases[0].height;
+        for (let c = 0; c < CHANNELS; c++) {
+          drawChannel(ctxs[c], channels[c], w, h);
+        }
+      }
+
+      const url = (location.protocol === 'https:' ? 'https:' : 'http:') + '//' + location.host + '/stream';
+      const es = new EventSource(url);
+      let first = true;
+
+      es.onmessage = function (ev) {
+        if (first) {
+          first = false;
+          statusEl.textContent = '已连接，正在显示波形';
+        }
+        try {
+          const buf = base64ToArrayBuffer(ev.data);
+          processChunk(buf);
+        } catch (e) {
+          console.warn(e);
+        }
+      };
+
+      es.onerror = function () {
+        statusEl.textContent = '连接断开或出错，请刷新页面';
+      };
+    })();
+  </script>
+</body>
+</html>

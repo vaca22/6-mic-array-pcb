@@ -1,0 +1,14 @@
+[Unit]
+Description=6-mic real-time waveform web
+After=network.target sound.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pi/6mic_web
+ExecStart=/usr/bin/python3 /home/pi/6mic_web/server.py
+Restart=on-failure
+RestartSec=3
+User=pi
+
+[Install]
+WantedBy=multi-user.target
