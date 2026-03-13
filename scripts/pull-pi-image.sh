@@ -1,11 +1,14 @@
 #!/bin/bash
 # 把树莓派整张 SD 卡拉到电脑，生成可烧录的 .img（或 .img.gz）
 # 用法: ./pull-pi-image.sh [Pi的IP] [保存路径]
-# 例:   ./pull-pi-image.sh 192.168.167.19 ~/Desktop/pi-backup.img.gz
+# 例:   ./pull-pi-image.sh 192.168.167.20 ~/Desktop/pi-backup.img.gz
+# Pi 地址也可写在上一级 pi-ip.conf 的 PI_IP
 
 set -e
-PI_IP="${1:-192.168.167.19}"
-OUT="${2:-$HOME/Desktop/pi-backup-$(date +%Y%m%d).img.gz}"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+[ -f "$DIR/pi-ip.conf" ] && . "$DIR/pi-ip.conf"
+PI_IP="${1:-${PI_IP:-192.168.167.20}}"
+OUT="${2:-$DIR/pi-backup-$(date +%Y%m%d).img.gz}"
 OUT_RAW="${OUT%.gz}"
 
 echo "Pi: $PI_IP"
