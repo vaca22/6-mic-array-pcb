@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>旁路由配置</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: system-ui, sans-serif;
+      background: #0f0f12;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+    h1 { font-size: 1.2rem; margin: 0 0 16px 0; font-weight: 600; }
+    .card {
+      background: #1a1a1e;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .status-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .status-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #666;
+    }
+    .status-dot.on { background: #4ade80; }
+    .status-dot.off { background: #f87171; }
+    .btn {
+      display: inline-block;
+      padding: 8px 14px;
+      margin-right: 8px;
+      margin-bottom: 6px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      background: #2d2d33;
+      color: #e0e0e0;
+    }
+    .btn:hover { background: #3d3d45; }
+    .btn.primary { background: #166534; color: #fff; }
+    .btn.primary:hover { background: #15803d; }
+    .btn.danger { background: #991b1b; color: #fff; }
+    .btn.danger:hover { background: #b91c1c; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .test-result { margin-top: 10px; font-size: 14px; }
+    .test-result.ok { color: #4ade80; }
+    .test-result.fail { color: #f87171; }
+    .hint { font-size: 12px; color: #888; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h1>旁路由配置</h1>
+  <div class="card">
+    <div class="status-row">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">加载中…</span>
+    </div>
+    <div>
+      <button type="button" class="btn primary" id="btnEnable">使用旁路由</button>
+      <button type="button" class="btn danger" id="btnDisable">不使用旁路由</button>
+    </div>
+    <p class="hint">网关将设为当前网段 .100（软路由 WAN）。重启后由“开机是否使用旁路由”决定。</p>
+  </div>
+  <div class="card">
+    <button type="button" class="btn" id="btnTest">测试访问谷歌</button>
+    <div class="test-result" id="testResult"></div>
+  </div>
+  <script>
+    (function () {
+      const statusDot = document.getElementById('statusDot');
+      const statusText = document.getElementById('statusText');
+      const btnEnable = document.getElementById('btnEnable');
+      const btnDisable = document.getElementById('btnDisable');
+      const btnTest = document.getElementById('btnTest');
+      const testResult = document.getElementById('testResult');
+
+      function setLoading(loading) {
+        btnEnable.disabled = loading;
+        btnDisable.disabled = loading;
+      }
+
+      function fetchStatus() {
+        return fetch('/api/status').then(r => r.json());
+      }
+
+      function refreshStatus() {
+        fetchStatus().then(data => {
+          const on = data.bypass === true;
+          statusDot.className = 'status-dot ' + (on ? 'on' : 'off');
+          statusText.textContent = on ? '当前：使用旁路由（网关 .100）' : '当前：未使用旁路由';
+        }).catch(() => {
+          statusDot.className = 'status-dot off';
+          statusText.textContent = '获取状态失败';
+        });
+      }
+
+      btnEnable.onclick = function () {
+        setLoading(true);
+        fetch('/api/enable').then(r => r.json()).then(data => {
+          setLoading(false);
+          refreshStatus();
+          if (!data.ok) alert(data.message || '操作失败');
+        }).catch(() => { setLoading(false); refreshStatus(); });
+      };
+
+      btnDisable.onclick = function () {
+        setLoading(true);
+        fetch('/api/disable').then(r => r.json()).then(data => {
+          setLoading(false);
+          refreshStatus();
+          if (!data.ok) alert(data.message || '操作失败');
+        }).catch(() => { setLoading(false); refreshStatus(); });
+      };
+
+      btnTest.onclick = function () {
+        testResult.textContent = '测试中…';
+        testResult.className = 'test-result';
+        btnTest.disabled = true;
+        fetch('/api/test-google').then(r => r.json()).then(data => {
+          btnTest.disabled = false;
+          if (data.ok) {
+            testResult.textContent = '可以访问谷歌（HTTP ' + (data.code || '200') + '）';
+            testResult.className = 'test-result ok';
+          } else {
+            testResult.textContent = '无法访问谷歌（HTTP ' + (data.code || '') + '）';
+            testResult.className = 'test-result fail';
+          }
+        }).catch(() => {
+          btnTest.disabled = false;
+          testResult.textContent = '请求失败';
+          testResult.className = 'test-result fail';
+        });
+      };
+
+      refreshStatus();
+    })();
+  </script>
+</body>
+</html>

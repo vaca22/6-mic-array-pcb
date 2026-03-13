@@ -1,0 +1,15 @@
+[Unit]
+Description=Bypass gateway config web
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pi/bypass_web
+ExecStart=/usr/bin/python3 /home/pi/bypass_web/server.py
+Restart=on-failure
+RestartSec=3
+User=pi
+
+[Install]
+WantedBy=multi-user.target

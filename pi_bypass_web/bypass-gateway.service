@@ -1,0 +1,13 @@
+[Unit]
+Description=Transparent bypass proxy (redsocks) at boot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/bypass-proxy.sh start
+ExecStop=/usr/local/bin/bypass-proxy.sh stop
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
