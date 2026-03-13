@@ -11,9 +11,9 @@ import os
 import socket
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
-# 6ch, S32_LE, 16kHz. Chunk = 512 frames (~32ms)
+# 8ch (6 mics + 2 ref), S32_LE, 16kHz. Chunk = 512 frames (~32ms)
 RATE = 16000
-CHANNELS = 6
+CHANNELS = 8
 CHUNK_FRAMES = 512
 BYTES_PER_SAMPLE = 4
 CHUNK_BYTES = CHUNK_FRAMES * CHANNELS * BYTES_PER_SAMPLE

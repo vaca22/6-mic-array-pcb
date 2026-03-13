@@ -35,16 +35,18 @@
   </style>
 </head>
 <body>
-  <h1>6 路麦克风实时波形</h1>
+  <h1>8 通道实时波形（Ch2/Ch3 为回声参考，其余 6 路为麦克风）</h1>
   <div id="channels"></div>
   <p class="status" id="status">正在连接…</p>
   <script>
     (function () {
       const RATE = 16000;
-      const CHANNELS = 6;
+      const CHANNELS = 8;
       const CHUNK_FRAMES = 512;
       const BYTES_PER_SAMPLE = 4;
       const CHUNK_BYTES = CHUNK_FRAMES * CHANNELS * BYTES_PER_SAMPLE;
+      // 实际顺序：Ch0/1=麦1/2, Ch2/3=回声参考(不动), Ch4/5/6/7=麦3/4/5/6
+      const CH_LABELS = ['麦1', '麦2', '回声Ref1', '回声Ref2', '麦3', '麦4', '麦5', '麦6'];
 
       const container = document.getElementById('channels');
       const statusEl = document.getElementById('status');
@@ -55,7 +57,7 @@
         const wrap = document.createElement('div');
         wrap.className = 'ch';
         const label = document.createElement('label');
-        label.textContent = '麦克风 ' + (c + 1);
+        label.textContent = CH_LABELS[c] || ('Ch' + (c + 1));
         const canvas = document.createElement('canvas');
         canvas.width = 800;
         canvas.height = 48;
